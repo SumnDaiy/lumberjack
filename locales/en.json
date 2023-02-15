@@ -1,0 +1,22 @@
+{
+    "menu_title": "Lumberjack Menu",
+    "open_menu": "%s Open menu",
+    "start_job": "Start working",
+    "stop_job": "Stop working",
+    "get_trailer": "Request a trailer",
+    "get_payment": "Hand over sheet",
+    "blip_trailer": "Trailer",
+    "blip_trailer_lost": "Last Location of Trailer",
+    "trailer_created": "Trailer is ready.  \n It's marked on your map!",
+    "area_occupied": "Area is occupied!",
+    "notify_title": "Lumberjack",
+    "alert_header": "Warning!",
+    "alert_warning": "This will also delete your trailer.  \n Do you want to continue?",
+    "current_group": "Manage Group",
+    "group_members": "Group Members",
+    "invite_player": "Invite a player to your group",
+    "invite_player_description": "Invite Players",
+    "current_group_description": "Kick or see players in your group",
+    "cut_tree": "Cutdown Tree",
+    "missed_skillcheck": "Be more careful!"
+}
