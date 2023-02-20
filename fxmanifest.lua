@@ -4,7 +4,7 @@ use_experimental_fxv2_oal 'yes'
 lua54        'yes'
 game         'gta5'
 
-name "projectr_lumberjack"
+name "lumberjack"
 description "good"
 author "SumnDaiy"
 version "1.0"

@@ -11,7 +11,7 @@ AddEventHandler('onResourceStop', function(resourceName)
     DeleteEntity(Ped)
 end)
 
-lib.callback.register('projectr_lumberjack:createTrailer', function (source)
+lib.callback.register('lumberjack:createTrailer', function (source)
   local vehicle = Ox.CreateVehicle({
     model = 'trflat',
     owner = false,
@@ -30,7 +30,7 @@ lib.callback.register('projectr_lumberjack:createTrailer', function (source)
   end
 end)
 
-lib.callback.register('projectr_lumberjack:returnPlayer', function (_, target)
+lib.callback.register('lumberjack:returnPlayer', function (_, target)
   local target = Ox.GetPlayer(target)
 
   if target then return target end
@@ -38,7 +38,21 @@ lib.callback.register('projectr_lumberjack:returnPlayer', function (_, target)
   return false
 end)
 
-lib.callback.register('projectr_lumberjack:DeleteTrailer', function (_, trailer)
+lib.callback.register('lumberjack:GetPayment', function(source, amount)
+  if source then
+    local success, response = exports.ox_inventory:AddItem(source, 'money', amount)
+    if not success then
+      print(response)
+    end
+--[[     lib.notify(source{
+      title = locale('notify_title'),
+      description = locale('paid', amount),
+      type = 'success'
+  }) ]]
+  end
+end)
+
+lib.callback.register('lumberjack:DeleteTrailer', function (_, trailer)
   if trailer then
     local vehicle = Ox.GetVehicle(trailer)
     if vehicle then

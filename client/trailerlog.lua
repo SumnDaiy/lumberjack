@@ -48,11 +48,11 @@ end
 
 
 
-AddEventHandler("projectr_lumberjack:AddVehicleLog", function(data)
-    local added = lib.callback.await('projectr_lumberjack:AddTrailerLogServer', 200, data.entity, NetworkGetNetworkIdFromEntity(data.entity), GetEntityCoords(data.entity))
+AddEventHandler("lumberjack:AddVehicleLog", function(data)
+    local added = lib.callback.await('lumberjack:AddTrailerLogServer', 200, data.entity, NetworkGetNetworkIdFromEntity(data.entity), GetEntityCoords(data.entity))
 
     if added then
-        local removeLog = lib.callback.await("projectr_lumberjack:removeLog", 200, source)
+        local removeLog = lib.callback.await("lumberjack:removeLog", 200, source)
     end
 end)
 
@@ -78,62 +78,67 @@ AddStateBagChangeHandler("logs", nil, function(bagName, key, value)
 end)
 
 
-AddEventHandler("projectr_lumberjack:RemoveVehicleLog", function(data)
-    local remove = lib.callback.await('projectr_lumberjack:RemoveVehicleLog', 200, NetworkGetNetworkIdFromEntity(data.entity))
+AddEventHandler("lumberjack:RemoveVehicleLog", function(data)
+    local remove = lib.callback.await('lumberjack:RemoveVehicleLog', 200, NetworkGetNetworkIdFromEntity(data.entity))
     if remove then
-        lib.callback.await('projectr_lumberjack:giveReward', 200, source)
+        lib.callback.await('lumberjack:giveReward', 200, source)
     end
 end)
 
 
-function GetLogsOnTrailer(trailer)
-    local logs = Entity(trailer).state.logs
-    local logsCount = #logs
-    return logsCount
+function GetLogsOnTrailer(netID)
+    local netVeh = NetworkGetEntityFromNetworkId(netID)
+    local logs = Entity(netVeh).state.logs
+    if logs then
+        local logsCount = #logs
+        return logsCount
+    end
 end
 
 local optionNames = {}
 
-RegisterNetEvent('projectr_lumberjack:addTarget', function (trailer)
+RegisterNetEvent('lumberjack:addTarget', function (trailer)
     local options = {
         {
-            name = "projectr_lumberjack:AddVehicleLog",
+            name = "lumberjack:AddVehicleLog",
             icon = "fa-solid fa-plus",
-            label = "Put log on trailer",
+            label = locale('target_add_log'),
             distance = 2,
             items = 'log',
             canInteract = function (entity)
-                if GetLogsOnTrailer(entity) < counter then
+                local netID = NetworkGetNetworkIdFromEntity(entity)
+                if GetLogsOnTrailer(netID) < counter then
                     return true
                 end
             end,
             onSelect = function(data)
-                TriggerEvent("projectr_lumberjack:AddVehicleLog", data)
+                TriggerEvent("lumberjack:AddVehicleLog", data)
             end
         },
         {
-            name = "projectr_lumberjack:RemoveVehicleLog",
+            name = "lumberjack:RemoveVehicleLog",
             icon = "fa-solid fa-minus",
-            label = "Rönk leszedése",
+            label = locale('target_remove_log'),
             distance = 2,
             canInteract = function(entity)
                 local amount = exports.ox_inventory:Search('count', 'log')
+                local netID = NetworkGetNetworkIdFromEntity(entity)
                 
-                if amount == 0 and GetLogsOnTrailer(entity) > 0 then
+                if amount == 0 and GetLogsOnTrailer(netID) > 0 then
                     return true
                 end
             end,
             onSelect = function(data)
-                TriggerEvent("projectr_lumberjack:RemoveVehicleLog", data)
+                TriggerEvent("lumberjack:RemoveVehicleLog", data)
             end
         }
     }
     
-    optionNames = {'projectr_lumberjack:AddVehicleLog', 'projectr_lumberjack:RemoveVehicleLog'}
+    optionNames = {'lumberjack:AddVehicleLog', 'lumberjack:RemoveVehicleLog'}
     exports.ox_target:addEntity(trailer, options)
 end)
 
-RegisterNetEvent('projectr_lumberjack:removeTarget', function(trailer)
+RegisterNetEvent('lumberjack:removeTarget', function(trailer)
     if trailer then
         exports.ox_target:removeEntity(trailer, optionNames)
         return true

@@ -4,7 +4,7 @@ playerState = LocalPlayer.state
 
 local options = {
     {
-        name = "projectr_lumberjack:cutTree",
+        name = "lumberjack:cutTree",
         icon = "fa-solid fa-axe",
         label = locale('cut_tree'),
         items = "WEAPON_HATCHET",
@@ -14,7 +14,7 @@ local options = {
             end
         end,
         onSelect = function (entity)
-            TriggerEvent("projectr_lumberjack:cutTree", entity)
+            TriggerEvent("lumberjack:cutTree", entity)
         end
     }
 }
@@ -24,16 +24,13 @@ AddStateBagChangeHandler('tree', nil, function(bagName, key, value)
 
     if entity == 0 or not value then return end
 
-    exports.ox_target:removeEntity(NetworkGetNetworkIdFromEntity(entity), "projectr_lumberjack:cutTree")
+    exports.ox_target:removeEntity(NetworkGetNetworkIdFromEntity(entity), "lumberjack:cutTree")
     exports.ox_target:addEntity(NetworkGetNetworkIdFromEntity(entity), options)
 
-    print('helo')
     if NetworkGetEntityOwner(entity) == cache.playerId then
         while not HasCollisionLoadedAroundEntity(entity) do
-            print('helo')
             Wait(100)
         end
-        print('helo')
         local offset = 0.9
         FreezeEntityPosition(entity, true)
         SetEntityRotation(entity, value.rotation.x, value.rotation.y, value.rotation.z, 0, false)
@@ -65,33 +62,63 @@ AddStateBagChangeHandler('stump', nil, function(bagName, key, value)
 end)
 
 function CutTree(data)
-    -- Solution to run skill checks for the progressbar timer?
-end
+    local anim = {
+        dict = 'melee@hatchet@streamed_core',
+        clip = 'plyr_rear_takedown_b',
+        lockX = true,
+        lockY = true,
+        lockZ = false,
+    }
 
-AddEventHandler("projectr_lumberjack:cutTree", function (data)
+    lib.requestAnimDict(anim.dict)
 
-    local successful = lib.skillCheck({'easy', 'easy', 'easy', 'easy', 'easy',})
+    TaskPlayAnim(cache.ped, anim.dict, anim.clip, anim.blendIn or 3.0, anim.blendOut or 1.0, anim.duration or -1, anim.flag or 49, anim.playbackRate or 0, anim.lockX, anim.lockY, anim.lockZ)
+    RemoveAnimDict(anim.dict)
+
+    local successful = lib.skillCheck({'easy','easy','easy','easy', 'easy','easy','easy','easy'}, {'a', 'd'})
+
     if successful then
-        TriggerServerEvent('projectr_lumberjack:placeStump', data, NetworkGetNetworkIdFromEntity(data.entity), GetEntityRotation(data.entity))
+        TriggerServerEvent('lumberjack:placeStump', data, NetworkGetNetworkIdFromEntity(data.entity), GetEntityRotation(data.entity))
 
-        lib.callback.await("projectr_lumberjack:giveReward", 200)
+        lib.callback.await("lumberjack:giveReward", 200)
 
         lib.notify({
             title = locale('notify_title'),
-            description = 'Sikeresen kivágtad a fát',
+            description = locale('successful_skillcheck'),
             type = 'success'
         })
     else
+        ClearPedTasksImmediately(cache.ped)
+        
+        local anim = {
+            dict = 'melee@hatchet@streamed_core',
+            clip = 'plyr_front_takedown_b',
+            lockX = true,
+            lockY = true,
+            lockZ = false,
+            duration = 5000,
+            flag = 15
+        }
+        
+        lib.requestAnimDict(anim.dict)
+    
+        TaskPlayAnim(cache.ped, anim.dict, anim.clip, anim.blendIn or 3.0, anim.blendOut or 1.0, anim.duration or -1, anim.flag or 49, anim.playbackRate or 0, anim.lockX, anim.lockY, anim.lockZ)
+        RemoveAnimDict(anim.dict)
+
         lib.notify({
             title = locale('notify_title'),
             description = locale('missed_skillcheck'),
             type = 'error'
         })
     end
+end
+
+AddEventHandler("lumberjack:cutTree", function (data)
+    CutTree(data)
 end)
 
 AddEventHandler('ox:playerLoaded',function ()
-    TriggerEvent('projectr_lumberjack:CarryLog')
+    TriggerEvent('lumberjack:CarryLog')
 end)
 
 function CustomControl()
@@ -142,7 +169,7 @@ function PlayCarryAnim()
     end
 end
 
-AddEventHandler('projectr_lumberjack:CarryLog', function ()
+AddEventHandler('lumberjack:CarryLog', function ()
     local logCount = exports.ox_inventory:Search('count', 'log')
     
     if logCount > 0 then

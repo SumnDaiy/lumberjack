@@ -25,7 +25,7 @@ CreateThread(function ()
     end
 end)
 
-RegisterNetEvent('projectr_lumberjack:placeStump', function (data, networkID, entityRotation)
+RegisterNetEvent('lumberjack:placeStump', function (data, networkID, entityRotation)
     local entityID = NetworkGetEntityFromNetworkId(networkID)
     local location = data.coords
     local rotation = entityRotation
@@ -39,11 +39,11 @@ RegisterNetEvent('projectr_lumberjack:placeStump', function (data, networkID, en
         location = data.coords,
         rotation = rotation
     }
-    TriggerEvent('projectr_lumberjack:treeTimer', netId, location, rotation)
+    TriggerEvent('lumberjack:treeTimer', netId, location, rotation)
     print('start timer')
 end)
 
-lib.callback.register("projectr_lumberjack:giveReward", function(source)
+lib.callback.register("lumberjack:giveReward", function(source)
     local player = Ox.GetPlayer(source)
     if player then
         exports.ox_inventory:AddItem(source, "log", 1)
@@ -51,7 +51,7 @@ lib.callback.register("projectr_lumberjack:giveReward", function(source)
     end
 end)
 
-lib.callback.register("projectr_lumberjack:removeLog", function(source)
+lib.callback.register("lumberjack:removeLog", function(source)
     local player = Ox.GetPlayer(source)
     if player then
         exports.ox_inventory:RemoveItem(source, "log", 1)
@@ -61,7 +61,7 @@ lib.callback.register("projectr_lumberjack:removeLog", function(source)
     end
 end)
 
-RegisterNetEvent('projectr_lumberjack:treeTimer', function (netId, location, rotation)
+RegisterNetEvent('lumberjack:treeTimer', function (netId, location, rotation)
     SetTimeout(Config.respawnTimer, function ()
         DeleteEntity(NetworkGetEntityFromNetworkId(netId))
         PlaceTree(location, rotation)

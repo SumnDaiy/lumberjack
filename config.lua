@@ -11,6 +11,8 @@ Config.trailerSpawnCoords = vec4(1207.345, -1229.944, 35.227, 271.916)
 
 Config.target = true
 
+Config.PriceMultiplier = 100 -- 1 log * 100 = 100$
+
 Config.Locations = {
     {
         model = Config.treeModel,

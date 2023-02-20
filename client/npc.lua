@@ -4,7 +4,6 @@ local isWorking = false
 local hasTrailer = false
 local trailerEntity = nil
 local netId = nil
-local map = {}
 local blip = nil
 local npc = nil
 local playerState = LocalPlayer.state
@@ -70,7 +69,7 @@ AddStateBagChangeHandler('trailerHandler', nil, function(bagName, key, value)
     if player then
         if value[player.charid] then
             netId = NetworkGetNetworkIdFromEntity(entity)
-            TriggerEvent('projectr_lumberjack:addTarget', netId)
+            TriggerEvent('lumberjack:addTarget', netId)
             if DoesBlipExist(blip) then
                 RemoveBlip(blip)
             end
@@ -110,6 +109,9 @@ function NewOptions()
         if not hasTrailer then
             options[#options+1] = alloptions[3]
         end
+        if hasTrailer and trailerEntity then
+            options[#options+1] = alloptions[4]
+        end
     end
     MenuData = {
         id = 'lumberjack_menu',
@@ -139,8 +141,8 @@ function MenuCB(selected, _, args)
             })
 
             if alert == 'confirm' then
-                TriggerEvent('projectr_lumberjack:removeTarget', netId)
-                local deleted = lib.callback.await('projectr_lumberjack:DeleteTrailer', 200, trailerEntity)
+                TriggerEvent('lumberjack:removeTarget', netId)
+                local deleted = lib.callback.await('lumberjack:DeleteTrailer', 200, trailerEntity.entityID)
 
                 if deleted then
                     isWorking = false
@@ -157,11 +159,17 @@ function MenuCB(selected, _, args)
         local occupied = IsPositionOccupied(coords.x, coords.y, coords.z, 20, false, true, false, false, false, 0, false)
 
         if not occupied then
-            local vehicle = lib.callback.await('projectr_lumberjack:createTrailer', 200)
+            local vehicle = lib.callback.await('lumberjack:createTrailer', 200)
+            --[[ print(json.encode(vehicle, {indent = true})) ]]
 
             if vehicle then
                 hasTrailer = true
-                trailerEntity = vehicle.entity
+                trailerEntity = 
+                    {
+                        entityID = vehicle.entity,
+                        netID = vehicle.netid,
+                        plate = vehicle.plate
+                    }
                 lib.notify({
                     title = locale('notify_title'),
                     description = locale('trailer_created'),
@@ -176,6 +184,25 @@ function MenuCB(selected, _, args)
                 position = 'top',
                 type = 'error'
             })
+        end
+    elseif args[1] == 'get_payment' then
+        if hasTrailer and isWorking and trailerEntity then
+            local logCount = GetLogsOnTrailer(trailerEntity.netID)
+            if logCount ~= nil and logCount > 0 then
+                if #(Config.bossLocation.xyz - GetEntityCoords(cache.ped)) < 5 then
+                    local removed = lib.callback.await('lumberjack:RemoveAllVehicleLog',200, trailerEntity.netID)
+                    if removed then
+                        lib.callback.await('lumberjack:GetPayment', 200, removed*Config.PriceMultiplier)
+                    end
+                end
+            else
+                lib.notify({
+                    title = locale('notify_title'),
+                    description = locale('tree_missing'),
+                    position = 'top',
+                    type = 'error'
+                })
+            end
         end
     end
     NewOptions()
@@ -201,10 +228,14 @@ if not Config.target then
     end
 end
 
+RegisterCommand('menu', function()
+    lib.showMenu('lumberjack_menu')
+end) 
+
 
 AddEventHandler('ox:playerLogout', function()
     if netId ~= nil then
-        TriggerEvent('projectr_lumberjack:removeTarget', netId)
+        TriggerEvent('lumberjack:removeTarget', netId)
         netId = nil
     end
 end)
@@ -225,7 +256,7 @@ local function inviteInputDialog()
     elseif invitedid == 0 then
         print('ServerID cant be 0')
     else
-        local target = lib.callback.await('projectr_lumberjack:returnPlayer', 200, invitedid)
+        local target = lib.callback.await('lumberjack:returnPlayer', 200, invitedid)
         if not target then
             print('no player found')
         else

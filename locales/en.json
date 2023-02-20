@@ -18,5 +18,10 @@
     "invite_player_description": "Invite Players",
     "current_group_description": "Kick or see players in your group",
     "cut_tree": "Cutdown Tree",
-    "missed_skillcheck": "Be more careful!"
+    "tree_missing": "There are no logs on the trailer",
+    "target_add_log": "Put log on trailer",
+    "target_remove_log": "Remove log from trailer",
+    "successful_skillcheck": "Well done!",
+    "missed_skillcheck": "Be more careful!",
+    "paid": "You've been paid %s!"
 }
