@@ -44,11 +44,6 @@ lib.callback.register('lumberjack:GetPayment', function(source, amount)
     if not success then
       print(response)
     end
---[[     lib.notify(source{
-      title = locale('notify_title'),
-      description = locale('paid', amount),
-      type = 'success'
-  }) ]]
   end
 end)
 

@@ -4,7 +4,7 @@
     "start_job": "Start working",
     "stop_job": "Stop working",
     "get_trailer": "Request a trailer",
-    "get_payment": "Hand over sheet",
+    "get_payment": "Hand over the logs",
     "blip_trailer": "Trailer",
     "blip_trailer_lost": "Last Location of Trailer",
     "trailer_created": "Trailer is ready.  \n It's marked on your map!",

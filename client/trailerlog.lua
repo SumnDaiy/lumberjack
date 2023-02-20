@@ -67,12 +67,10 @@ AddStateBagChangeHandler("logs", nil, function(bagName, key, value)
         Wait(250)
     end
     for i = 1, #value do
-        local logentity = NetworkGetEntityFromNetworkId(value[i])
-        
-        while not DoesEntityExist(logentity) do
-            logentity = NetworkGetEntityFromNetworkId(value[i])
+        while not NetworkDoesEntityExistWithNetworkId(value[i]) do
             Wait(0)
         end
+        local logentity = NetworkGetEntityFromNetworkId(value[i])
         AttachEntityToEntity(logentity, entity, 0, logPositions[i].x, logPositions[i].y, logPositions[i].z, 0, 0, 0, false, false, false, false, 2, true)
     end
 end)
@@ -89,6 +87,7 @@ end)
 function GetLogsOnTrailer(netID)
     local netVeh = NetworkGetEntityFromNetworkId(netID)
     local logs = Entity(netVeh).state.logs
+    
     if logs then
         local logsCount = #logs
         return logsCount

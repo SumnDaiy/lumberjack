@@ -31,6 +31,7 @@ AddStateBagChangeHandler('tree', nil, function(bagName, key, value)
         while not HasCollisionLoadedAroundEntity(entity) do
             Wait(100)
         end
+
         local offset = 0.9
         FreezeEntityPosition(entity, true)
         SetEntityRotation(entity, value.rotation.x, value.rotation.y, value.rotation.z, 0, false)
@@ -130,16 +131,20 @@ function CustomControl()
             if IsControlPressed(0, 35) then -- Right
                 FreezeEntityPosition(playerPed, false)
                 SetEntityHeading(playerPed, GetEntityHeading(playerPed)+0.5)
+
             elseif IsControlPressed(0, 34) then -- Left
                 FreezeEntityPosition(playerPed, false)
                 SetEntityHeading(playerPed, GetEntityHeading(playerPed)-0.5)
+
             elseif IsControlPressed(0, 32) or IsControlPressed(0, 33) then
                 FreezeEntityPosition(playerPed, false)
+
             else
                 FreezeEntityPosition(playerPed, true)
                 TaskPlayAnim(PlayerPedId(), 'combat@drag_ped@', 'injured_drag_plyr', 0.0, 0.0, 1, 2, 7, false, false, false)
             end
-            Wait(7)
+            Wait(0)
+
             if carryLog ~= 0 then
                 enable = true
             else
@@ -157,11 +162,13 @@ function PlayCarryAnim()
         lib.requestAnimDict('combat@drag_ped@')
         TaskPlayAnim(PlayerPedId(), 'combat@drag_ped@', 'injured_drag_plyr', 2.0, 2.0, 100000, 1, 0, false, false, false)
         CustomControl()
+        
         while carryLog ~= 0 do
             while not IsEntityPlayingAnim(PlayerPedId(), 'combat@drag_ped@', 'injured_drag_plyr', 1) do
                 TaskPlayAnim(PlayerPedId(), 'combat@drag_ped@', 'injured_drag_plyr', 2.0, 2.0, 100000, 1, 0, false, false, false)
                 Wait(0)
             end
+
             Wait(500)
         end
     else
@@ -193,11 +200,13 @@ end)
 
 AddEventHandler('onResourceStop', function(resourceName)
     ClearAllPedProps(cache.ped)
+
     if (GetCurrentResourceName() ~= resourceName) then
-      return
+        return
     end
+
     if carryLog ~= 0 then
-    DeleteEntity(carryLog)
-    carryLog = 0
+        DeleteEntity(carryLog)
+        carryLog = 0
     end
 end)

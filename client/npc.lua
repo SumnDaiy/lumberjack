@@ -14,6 +14,7 @@ local function CreateBlip(vehicle, coords)
     SetBlipDisplay(blip, 6)
     SetBlipScale(blip, 0.5)
     SetBlipAsShortRange(blip, false)
+
     if coords == nil then
         AddTextEntry('trailerBlip', locale('blip_trailer'))
         SetBlipColour(blip, 0)
@@ -23,6 +24,7 @@ local function CreateBlip(vehicle, coords)
     end
         BeginTextCommandSetBlipName('trailerBlip')
         EndTextCommandSetBlipName(blip)
+
     return blip
 end
 
@@ -51,6 +53,7 @@ AddStateBagChangeHandler('ped', nil, function(bagName, key, value)
     end
     
     if NetworkGetEntityOwner(entity) == cache.playerId then
+
         while not HasCollisionLoadedAroundEntity(entity) do
             Wait(100)
         end
@@ -63,23 +66,28 @@ end)
 
 AddStateBagChangeHandler('trailerHandler', nil, function(bagName, key, value)
     if not player then return end
+
     local entity = GetEntityFromStateBagName(bagName)
+
     if entity == 0 or not value then return end
 
     if player then
         if value[player.charid] then
             netId = NetworkGetNetworkIdFromEntity(entity)
             TriggerEvent('lumberjack:addTarget', netId)
+
             if DoesBlipExist(blip) then
                 RemoveBlip(blip)
             end
             blip = CreateBlip(entity, nil)
 
             local trailerCoords = GetEntityCoords(entity)
+
             while DoesEntityExist(entity) do
                 trailerCoords = GetEntityCoords(entity)
                 Wait(200)
             end
+
             RemoveBlip(blip)
             blip = CreateBlip(nil, trailerCoords)
         end
@@ -106,9 +114,11 @@ function NewOptions()
     options = {alloptions[1]}
     if isWorking then
         options = {alloptions[2]}
+
         if not hasTrailer then
             options[#options+1] = alloptions[3]
         end
+
         if hasTrailer and trailerEntity then
             options[#options+1] = alloptions[4]
         end
@@ -127,7 +137,9 @@ end
 function MenuCB(selected, _, args)
     if args[1] == "start_job" then
         isWorking = true
+
     elseif args[1] == 'stop_job' then
+
         if hasTrailer then
             local alert = lib.alertDialog({
                 header = locale('alert_header'),
@@ -160,7 +172,6 @@ function MenuCB(selected, _, args)
 
         if not occupied then
             local vehicle = lib.callback.await('lumberjack:createTrailer', 200)
-            --[[ print(json.encode(vehicle, {indent = true})) ]]
 
             if vehicle then
                 hasTrailer = true
@@ -191,6 +202,7 @@ function MenuCB(selected, _, args)
             if logCount ~= nil and logCount > 0 then
                 if #(Config.bossLocation.xyz - GetEntityCoords(cache.ped)) < 5 then
                     local removed = lib.callback.await('lumberjack:RemoveAllVehicleLog',200, trailerEntity.netID)
+
                     if removed then
                         lib.callback.await('lumberjack:GetPayment', 200, removed*Config.PriceMultiplier)
                     end
@@ -242,7 +254,7 @@ end)
 
 
 --@TODO Working Group System
-local groupList = {}
+--[[ local groupList = {}
 local function inviteInputDialog()
     ---@diagnostic disable-next-line: missing-parameter
     local input = lib.inputDialog('Invite to Group', {
@@ -264,7 +276,7 @@ local function inviteInputDialog()
             print(groupList[target.charid]) 
         end
     end
-end
+end ]]
 
 --[[ lib.registerContext({
     id = 'group_manager',
