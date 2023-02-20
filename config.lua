@@ -25,3 +25,13 @@ Config.Locations = {
         rotation = vector3(-13, 0, 30),
     },
 }
+
+Config.AddBlip = true
+Config.BlipSettings = {
+    coords = vec3(1200.505, -1276.669, 35.225),
+    id = 77,
+    display = 4,
+    scale = 0.8,
+    colour = 25,
+    name = 'Lumberjack'
+}

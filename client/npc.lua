@@ -8,6 +8,19 @@ local blip = nil
 local npc = nil
 local playerState = LocalPlayer.state
 
+if Config.AddBlip then
+    local settings = Config.BlipSettings
+    AddTextEntry(settings.name, settings.name)
+    local blip = AddBlipForCoord(settings.coords.x, settings.coords.y, settings.coords.z)
+    SetBlipSprite(blip, settings.id)
+    SetBlipDisplay(blip, 4)
+    SetBlipScale(blip, settings.scale)
+    SetBlipColour(blip, settings.colour)
+    SetBlipAsShortRange(blip, true)
+    BeginTextCommandSetBlipName(settings.name)
+    EndTextCommandSetBlipName(blip)
+end
+
 local function CreateBlip(vehicle, coords)
     local blip = coords and AddBlipForCoord(coords.x, coords.y, coords.z) or AddBlipForEntity(vehicle)
     SetBlipSprite(blip, 208)
