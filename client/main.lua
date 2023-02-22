@@ -33,7 +33,7 @@ AddStateBagChangeHandler('tree', nil, function(bagName, key, value)
         end
 
         local offset = 0.9
-        FreezeEntityPosition(entity, true)
+        --FreezeEntityPosition(entity, true)
         SetEntityRotation(entity, value.rotation.x, value.rotation.y, value.rotation.z, 0, false)
         PlaceObjectOnGroundProperly(entity)
 
@@ -52,7 +52,7 @@ AddStateBagChangeHandler('stump', nil, function(bagName, key, value)
             Wait(100)
         end
 
-        FreezeEntityPosition(entity, true)
+        --FreezeEntityPosition(entity, true)
         local offset = 0.9
         SetEntityRotation(entity, value.rotation.x, value.rotation.y, value.rotation.z, 0, false)
         PlaceObjectOnGroundProperly(entity)
@@ -79,15 +79,20 @@ function CutTree(data)
     local successful = lib.skillCheck({'easy','easy','easy','easy', 'easy','easy','easy','easy'}, {'a', 'd'})
 
     if successful then
-        TriggerServerEvent('lumberjack:placeStump', data, NetworkGetNetworkIdFromEntity(data.entity), GetEntityRotation(data.entity))
+        local netID = NetworkGetNetworkIdFromEntity(data.entity)
+        if lib.callback.await('lumberjack:CheckTree', 200, netID) then
+            TriggerServerEvent('lumberjack:placeStump', data, netID, GetEntityRotation(data.entity))
+            
+            lib.callback.await("lumberjack:giveReward", 200)
 
-        lib.callback.await("lumberjack:giveReward", 200)
-
-        lib.notify({
-            title = locale('notify_title'),
-            description = locale('successful_skillcheck'),
-            type = 'success'
-        })
+            lib.notify({
+                title = locale('notify_title'),
+                description = locale('successful_skillcheck'),
+                type = 'success'
+            })
+        else
+            print('huh?')
+        end
     else
         ClearPedTasksImmediately(cache.ped)
         

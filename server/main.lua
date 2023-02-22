@@ -1,4 +1,3 @@
-table = lib.table
 Trees = {}
 Stumps = {}
 
@@ -15,8 +14,9 @@ CreateThread(function ()
             true,
             false
         )
+        FreezeEntityPosition(treeObject, true)
         local netId = NetworkGetNetworkIdFromEntity(treeObject)
-        Trees[#Trees+1] = netId
+        Trees[netId] = true
         Entity(treeObject).state.tree = {
             model = tree.model,
             location = tree.location,
@@ -25,15 +25,23 @@ CreateThread(function ()
     end
 end)
 
+lib.callback.register('lumberjack:CheckTree', function(source, netID)
+    return source and Trees[netID] and DoesEntityExist(NetworkGetEntityFromNetworkId(netID))
+end)
+
 RegisterNetEvent('lumberjack:placeStump', function (data, networkID, entityRotation)
     local entityID = NetworkGetEntityFromNetworkId(networkID)
     local location = data.coords
     local rotation = entityRotation
+    --FreezeEntityPosition(entityID, false)
+    --ApplyForceToEntity(entityID, 0, math.random(), math.random(), 0, 0, 0, 0, 0, false, true, false, false, true)
     DeleteEntity(entityID)
+    Trees[networkID] = nil
     local offset = 0.9
     local stump = CreateObjectNoOffset(Config.stump, location.x, location.y, location.z-offset, true, true, false)
+    FreezeEntityPosition(stump, true)
     local netId = NetworkGetNetworkIdFromEntity(stump)
-    Stumps[#Stumps + 1] = netId
+    Stumps[netId] = true
     Entity(stump).state.stump = {
         model = Config.stump,
         location = data.coords,
@@ -44,16 +52,14 @@ RegisterNetEvent('lumberjack:placeStump', function (data, networkID, entityRotat
 end)
 
 lib.callback.register("lumberjack:giveReward", function(source)
-    local player = Ox.GetPlayer(source)
-    if player then
+    if source then
         exports.ox_inventory:AddItem(source, "log", 1)
         return true
     end
 end)
 
 lib.callback.register("lumberjack:removeLog", function(source)
-    local player = Ox.GetPlayer(source)
-    if player then
+    if source then
         exports.ox_inventory:RemoveItem(source, "log", 1)
         return true
     else
@@ -64,6 +70,7 @@ end)
 RegisterNetEvent('lumberjack:treeTimer', function (netId, location, rotation)
     SetTimeout(Config.respawnTimer, function ()
         DeleteEntity(NetworkGetEntityFromNetworkId(netId))
+        Stumps[netId] = nil
         PlaceTree(location, rotation)
     end)
 end)
@@ -71,6 +78,7 @@ end)
 function PlaceTree(location, rotation)
     local offset = 0.9
     local treeObject = CreateObjectNoOffset(Config.treeModel, location.x, location.y, location.z-offset, true, true, false)
+    FreezeEntityPosition(treeObject, true)
     local netId = NetworkGetNetworkIdFromEntity(treeObject)
     Trees[#Trees+1] = netId
     Entity(treeObject).state.tree = {
