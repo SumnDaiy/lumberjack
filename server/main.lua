@@ -33,8 +33,6 @@ RegisterNetEvent('lumberjack:placeStump', function (data, networkID, entityRotat
     local entityID = NetworkGetEntityFromNetworkId(networkID)
     local location = data.coords
     local rotation = entityRotation
-    --FreezeEntityPosition(entityID, false)
-    --ApplyForceToEntity(entityID, 0, math.random(), math.random(), 0, 0, 0, 0, 0, false, true, false, false, true)
     DeleteEntity(entityID)
     Trees[networkID] = nil
     local offset = 0.9
@@ -80,7 +78,7 @@ function PlaceTree(location, rotation)
     local treeObject = CreateObjectNoOffset(Config.treeModel, location.x, location.y, location.z-offset, true, true, false)
     FreezeEntityPosition(treeObject, true)
     local netId = NetworkGetNetworkIdFromEntity(treeObject)
-    Trees[#Trees+1] = netId
+    Trees[netId] = true
     Entity(treeObject).state.tree = {
         model = Config.treeModel,
         location = location,
@@ -92,15 +90,19 @@ AddEventHandler('onResourceStop', function(resourceName)
     if (GetCurrentResourceName() ~= resourceName) then
       return
     end
-    for i = 1, #Trees do
-        local entity = NetworkGetEntityFromNetworkId(Trees[i])
+    print('remove')
+    for key, value in pairs(Trees) do
+        local entity = NetworkGetEntityFromNetworkId(key)
         if DoesEntityExist(entity) then
+            print('deleted')
             DeleteEntity(entity)
         end
     end
-    for i = 1, #Stumps do
-        local entity = NetworkGetEntityFromNetworkId(Stumps[i])
+    for key, value in pairs(Stumps) do
+        print(key)
+        local entity = NetworkGetEntityFromNetworkId(key)
         if DoesEntityExist(entity) then
+            print('deleted')
             DeleteEntity(entity)
         end
     end
