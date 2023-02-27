@@ -2,6 +2,7 @@
     "menu_title": "Lumberjack Menu",
     "open_menu": "%s Open menu",
     "start_job": "Start working",
+    "job_info": "Information",
     "stop_job": "Stop working",
     "get_trailer": "Request a trailer",
     "get_payment": "Hand over the logs",
@@ -23,5 +24,7 @@
     "target_remove_log": "Remove log from trailer",
     "successful_skillcheck": "Well done!",
     "missed_skillcheck": "Be more careful!",
-    "paid": "You've been paid %s!"
+    "paid": "You've been paid %s!",
+    "info_title": "Job Information",
+    "info_text": "Hi, I'm John. Im providing lumberjack work for the city. First you will need a Hatchet that you can get from YouTool. You'll also need a truck for the trailer. Then, head to the forest and start chopping the trees. Put them on the trailer and bring them back to me."
 }
