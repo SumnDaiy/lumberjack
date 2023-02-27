@@ -8,17 +8,21 @@ local blip = nil
 local npc = nil
 local playerState = LocalPlayer.state
 
+
+
 if Config.AddBlip then
-    local settings = Config.BlipSettings
-    AddTextEntry(settings.name, settings.name)
-    local blip = AddBlipForCoord(settings.coords.x, settings.coords.y, settings.coords.z)
-    SetBlipSprite(blip, settings.id)
-    SetBlipDisplay(blip, 4)
-    SetBlipScale(blip, settings.scale)
-    SetBlipColour(blip, settings.colour)
-    SetBlipAsShortRange(blip, true)
-    BeginTextCommandSetBlipName(settings.name)
-    EndTextCommandSetBlipName(blip)
+    for i = 1, #Config.BlipSettings do
+        local settings = Config.BlipSettings[i]
+        AddTextEntry(settings.name, settings.name)
+        local blip = AddBlipForCoord(settings.coords.x, settings.coords.y, settings.coords.z)
+        SetBlipSprite(blip, settings.id)
+        SetBlipDisplay(blip, 4)
+        SetBlipScale(blip, settings.scale)
+        SetBlipColour(blip, settings.colour)
+        SetBlipAsShortRange(blip, true)
+        BeginTextCommandSetBlipName(settings.name)
+        EndTextCommandSetBlipName(blip)
+    end
 end
 
 local function CreateBlip(vehicle, coords)
@@ -109,12 +113,13 @@ end)
 
 local alloptions = {
     {label = locale('start_job'), icon = 'play', args = {'start_job'}},
+    {label = locale('job_info'), icon = 'info', args = {'job_info'}},
     {label = locale('stop_job'), icon = 'stop', args = {'stop_job'}},
     {label = locale('get_trailer'), icon = 'trailer', args = {'get_trailer'}},
     {label = locale('get_payment'), icon = 'money-bill-1', args = {'get_payment'}}
 }
 
-local options = {alloptions[1]}
+local options = {alloptions[1], alloptions[2]}
 
 MenuData = {
     id = 'lumberjack_menu',
@@ -124,7 +129,7 @@ MenuData = {
 }
 
 function NewOptions()
-    options = {alloptions[1]}
+    options = {alloptions[1], alloptions[2]}
     if isWorking then
         options = {alloptions[2]}
 
@@ -150,6 +155,14 @@ end
 function MenuCB(selected, _, args)
     if args[1] == "start_job" then
         isWorking = true
+
+    elseif args[1] == "job_info" then
+        local alert = lib.alertDialog({
+            header = locale('info_title'),
+            content = locale('info_text'),
+            centered = true,
+            cancel = true
+        })
 
     elseif args[1] == 'stop_job' then
 
